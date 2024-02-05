@@ -43,10 +43,10 @@ class Server {
     // bookings
     const bookingsController = new BookingsController(this._services.bookingsService);
 
-    this.app.get("/bookings", async (req: Request, res: Response) => await bookingsController.get(req, res));
-    this.app.post("/bookings", async (req: Request, res: Response) => await bookingsController.create(req, res));
-    this.app.delete("/bookings/:id", async (req: Request, res: Response) => await bookingsController.delete(req, res));
-    this.app.patch("/bookings/:id", async (req: Request, res: Response) => await bookingsController.update(req, res));
+    this.app.get("/api/bookings", async (req: Request, res: Response) => await bookingsController.get(req, res));
+    this.app.post("/api/bookings", async (req: Request, res: Response) => await bookingsController.create(req, res));
+    this.app.delete("/api/bookings/:id", async (req: Request, res: Response) => await bookingsController.delete(req, res));
+    this.app.patch("/api/bookings/:id", async (req: Request, res: Response) => await bookingsController.update(req, res));
   }
 
   private initServices(): {bookingsService: IBookingsService} {
