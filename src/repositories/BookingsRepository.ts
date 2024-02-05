@@ -9,7 +9,7 @@ export interface IBookingsRepository {
     delete(id: number, userId?: number): Promise<Booking>;
     get(limit: number, offset: number, userId?: number): Promise<Booking[]>;
     getById(id: number, userId?: number): Promise<Booking>;
-    update(booking: Partial<InputBookingDto>): Promise<Booking>;
+    update(id: number, booking: Partial<InputBookingDto>, userId?: number): Promise<Booking>;
 }
 
 export class BookingsRepository implements IBookingsRepository {
@@ -59,8 +59,8 @@ export class BookingsRepository implements IBookingsRepository {
         return this.deserialize(result[0]);
     }
 
-    public async update(booking: Partial<InputBookingDto>): Promise<Booking> {
-        const result = await this._database.update(booking);
+    public async update(id: number, booking: Partial<InputBookingDto>, userId?: number): Promise<Booking> {
+        const result = await this._database.update(id, booking, userId);
 
         if (result.length === 0) {
             throw RESOURCE_IS_NOT_UPDATED;

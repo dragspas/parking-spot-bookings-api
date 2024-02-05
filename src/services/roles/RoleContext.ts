@@ -13,13 +13,20 @@ export class RoleContext {
 
     public setRole(role: Role): IRole {
         switch (role) {
-            case Role.Admin:
+            case Role.Admin: {
                 this._role = new AdminRole();
-            case Role.Standard:
+                break;
+            }
+            case Role.Standard: {
                 this._role = new StandardRole();
-            default:
+                break;
+            }
+            default: {
                 throw UNAUTHORIZED;
+            }
         }
+
+        return this._role;
     }
 
     public hasMasterAccess(): boolean {

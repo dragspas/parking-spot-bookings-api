@@ -4,6 +4,16 @@ import { BookingsController } from "./controllers/BookingsController";
 import { BookingsService, IBookingsService } from "./services/BookingsService";
 import { BookingsRepository, IBookingsRepository } from "./repositories/BookingsRepository";
 import { BookingsDatabase, IBookingsDatabase } from "./database/BookingsDatabase";
+import bodyParser from "body-parser";
+import { globalErrorHandlerMiddleware } from "./middlewares/GlobalErrorHandler";
+
+process.on("unhandledRejection", (reason, _promise) => {
+  console.error("Unhandled Promise Rejection:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+});
 
 class Server {
   private app: Application;
@@ -13,12 +23,23 @@ class Server {
   constructor() {
     this.app = express();
 
+    this.app.use(bodyParser.json());
+    this.app.use(
+      bodyParser.urlencoded({
+        extended: true,
+      }),
+    );
+
     this.database = new Postgres();
     this.database.connect();
 
     this._services = this.initServices();
     
     this.setupRoutes();
+
+    this.app.use((err: any, req: Request, res: Response, next: any) => {
+      globalErrorHandlerMiddleware(err, req, res, next);
+    });
   }
 
   public startServer(): void {

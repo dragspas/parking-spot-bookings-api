@@ -1,11 +1,9 @@
-export class ErrorReport extends Error {
+export class ErrorReport {
     private readonly _status: number;
     private readonly _message: string;
     private readonly _details: any[];
 
     constructor(status: number, message: string, details: any[] = []) {
-        super(message);
-
         this._status = status;
         this._message = message;
         this._details = details;
@@ -38,7 +36,6 @@ export class ErrorReport extends Error {
 
 export const BAD_REQUEST = new ErrorReport(400, "Bad Request.");
 export const UNAUTHORIZED = new ErrorReport(401, "Unauthorized.");
-export const FORBIDDEN = new ErrorReport(403, "Forbidden.");
 export const INTERNAL_SERVER_ERROR = new ErrorReport(500, "Internal Server Error.");
 export const RESOURCE_IS_NOT_CREATED = new ErrorReport(400, "Resource is not created.");
 export const RESOURCE_IS_NOT_UPDATED = new ErrorReport(400, "Resource is not updated.");

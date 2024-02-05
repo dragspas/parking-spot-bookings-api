@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { JoiValidation } from "../validations/JoiValidation";
-import { BOOKING_UPDATE_BODY, BOOKING_UPDATE_QUERY } from "../validations/schemas";
+import { BOOKING_UPDATE_BODY, BOOKING_UPDATE_PARAMS } from "../validations/schemas";
 import { AuthRequest } from "./AuthRequest";
 
 export class PatchBookingsRequest extends AuthRequest {
@@ -12,10 +12,10 @@ export class PatchBookingsRequest extends AuthRequest {
     constructor(req: Request) {
         super(req);
         
-        const validatedQuery = JoiValidation.validate(BOOKING_UPDATE_QUERY, req.body);
+        const validatedParams = JoiValidation.validate(BOOKING_UPDATE_PARAMS, req.params);
         const validatedBody = JoiValidation.validate(BOOKING_UPDATE_BODY, req.body);
 
-        this.id = validatedQuery.id;
+        this.id = validatedParams.id;
         this.startDateTime = validatedBody.start_date_time ?? undefined;
         this.endDateTime = validatedBody.end_date_time ?? undefined;
         this.parkingSpotId = validatedBody.parking_spot_id ?? undefined;

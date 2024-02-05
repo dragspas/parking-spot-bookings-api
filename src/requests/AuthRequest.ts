@@ -13,9 +13,10 @@ export class AuthRequest {
 
         // @note
         // token format: userId|role
-        // actualy token should be in same standard format, JWT for example
+        // actualy token should be in samo standard format, JWT for example
         // but for simplicity I will use this
         // because basiclly, when we extract data from JWT, we should get same info
+        // also I will skip DB token authentication
         const parsedToken = validated.token.split("|");
         
         if (parsedToken.length !== 2 || (parsedToken[1] !== Role.Admin && parsedToken[1] !== Role.Standard)) {

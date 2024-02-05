@@ -9,7 +9,7 @@ export class DeleteBookingsRequest extends AuthRequest {
     constructor(req: Request) {
         super(req);
 
-        const validated = JoiValidation.validate(BOOKING_DELETE, req.query);
+        const validated = JoiValidation.validate(BOOKING_DELETE, req.params);
 
         this.id = Number(validated.id);
     }

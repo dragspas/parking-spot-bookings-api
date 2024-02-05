@@ -9,7 +9,7 @@ export interface IBookingsDatabase {
     delete(id: number, userId?: number): Promise<booking[]>;
     get(limit: number, offset: number, userId?: number): Promise<booking[]>;
     getById(id: number, userId?: number): Promise<booking[]>;
-    update(booking: Partial<InputBookingDto>): Promise<booking[]>
+    update(id: number, booking: Partial<InputBookingDto>, userId?: number): Promise<booking[]>
 }
 
 export class BookingsDatabase implements IBookingsDatabase {
@@ -51,49 +51,78 @@ export class BookingsDatabase implements IBookingsDatabase {
 
     public async delete(id: number, userId?: number): Promise<booking[]> {
         let query = `DELETE FROM ${BookingsDatabase.TABLE_NAME}`;
+        let key = 1;
+        let params: any[] = [];
 
         if (userId !== undefined) {
-            query += ` ${this.includeUserIdCondition(1)}`;
+            query += ` ${this.includeUserIdCondition(key)}`;
+            params.push(userId);
+            key++;
         }
 
-        query += ` WHERE id = $${userId !== undefined ? 2 : 1} RETURNING *;`;
+        query += key > 1 ? ` AND id = $${key}` : ` WHERE id = $${key}`;
+        query += ` RETURNING *;`;
+        params.push(id);
 
-        return this._pool.query(query, [id, userId]);
+        return this._pool.query(query, params);
     }
 
     public async getById(id: number, userId?: number): Promise<booking[]> {
         let query = `SELECT * FROM ${BookingsDatabase.TABLE_NAME}`;
+        let params: any[] = [];
+        let key = 1;
 
         if (userId !== undefined) {
-            query += ` ${this.includeUserIdCondition(1)}`;
+            query += ` ${this.includeUserIdCondition(key)}`;
+            params.push(userId);
+            key++;
         }
 
-        query += ` WHERE id = $${userId !== undefined ? 2 : 1} LIMIT 1;`;
+        query += key > 1 ? ` AND id = $${key};` : ` WHERE id = $${key};`;
 
         return this._pool.query<booking>(query, [id, userId]);
     }
 
-    public async update(booking: Partial<InputBookingDto>): Promise<booking[]> {
-        let query = `UPDATE ${BookingsDatabase.TABLE_NAME}`;
+    public async update(id: number, booking: Partial<InputBookingDto>, userId?: number): Promise<booking[]> {
+        let query = `UPDATE ${BookingsDatabase.TABLE_NAME} SET`;
         let params: any[] = [];
         let key = 1;
 
-        [
-            BookingFieldName.UserId, 
-            BookingFieldName.StartDateTime, 
-            BookingFieldName.EndDateTime, 
-            BookingFieldName.ParkingSpotId
-        ].forEach(field => {
-            if (booking[field] !== undefined) {
-                query += ` SET ${field} = $${key}`;
-                params.push(booking[field]);
-                key++;
-            }
-        });
+        if (booking.start_date_time !== undefined) {
+            query += ` start_date_time = $${key},`;
+            params.push(booking.start_date_time);
+            key++;
+        }
+        if (booking.end_date_time !== undefined) {
+            query += ` end_date_time = $${key},`;
+            params.push(booking.end_date_time);
+            key++;
+        }
+        if (booking.parking_spot_id !== undefined) {
+            query += ` parking_spot_id = $${key},`;
+            params.push(booking.parking_spot_id);
+            key++;
+        }
 
-        query += ` WHERE id = $${key} RETURNING *;`;   
+        if (params.length === 0) {
+            // prevent updating nothing since we have Partial<InputBookingDto>
+            throw new Error("Nothing to update.");
+        }
 
-        return this._pool.query<booking>(query, params);
+        query = query.slice(0, -1); // remove last comma
+
+        if (userId !== undefined) {
+            query += ` ${this.includeUserIdCondition(key)}`;
+            params.push(userId);
+            key++;
+            query += ` AND id = $${key}`;
+        } else {
+            query += ` WHERE id = $${key}`;
+        }
+
+        query += ` RETURNING *;`;  
+
+        return this._pool.query<booking>(query, [...params, id]);
     }
 
     protected includeUserIdCondition(key: number): string {

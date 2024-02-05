@@ -15,7 +15,7 @@ export const BOOKING = Joi.object({
     parking_spot_id: Joi.number().integer().required()
 });
 
-export const BOOKING_UPDATE_QUERY = Joi.object({
+export const BOOKING_UPDATE_PARAMS = Joi.object({
     id: Joi.number().integer().required()
 });
 

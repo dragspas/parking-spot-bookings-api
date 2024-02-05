@@ -17,13 +17,12 @@ export class BookingsController {
             // by time frame
             const {userId, role, offset, limit} = new GetBookingsRequest(req);
 
-            const result = await this.bookingService.getBookings(userId, role, limit, offset);
+            const result = await this.bookingService.get(userId, role, limit, offset);
 
             return res.status(200).json(result);
         } catch (error: any) {
             // @note
             // here we should add some logs, so we could monitor and track incidents
-
             return this.sendError(res, error);
         }
     }
@@ -31,8 +30,6 @@ export class BookingsController {
     async create(req: Request, res: Response): Promise<Response> {
         try{
             const {userId, startDateTime, endDateTime, parkingSpotId} = new PostBookingsRequest(req);
-            
-            this.bookingService.checkAvailability(parkingSpotId, startDateTime, endDateTime);
 
             const result = await this.bookingService.create(userId, startDateTime, endDateTime, parkingSpotId);
 
@@ -70,7 +67,7 @@ export class BookingsController {
     // this method should be in base class
     // and reused in other controllers
     // to keep it simple and clean I will leave it here
-    protected async sendError(res: Response, error: ErrorReport): Promise<Response> {
+    protected sendError(res: Response, error: any): Response {
         if (error instanceof ErrorReport) {
             return res.status(error.status).send(error.body);
         }
