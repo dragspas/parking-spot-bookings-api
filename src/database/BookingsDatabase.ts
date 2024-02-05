@@ -79,8 +79,9 @@ export class BookingsDatabase implements IBookingsDatabase {
         }
 
         query += key > 1 ? ` AND id = $${key};` : ` WHERE id = $${key};`;
+        params.push(id);
 
-        return this._pool.query<booking>(query, [id, userId]);
+        return this._pool.query<booking>(query, params);
     }
 
     public async update(id: number, booking: Partial<InputBookingDto>, userId?: number): Promise<booking[]> {

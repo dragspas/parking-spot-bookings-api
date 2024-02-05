@@ -52,7 +52,7 @@ export class BookingsRepository implements IBookingsRepository {
     public async getById(id: number, userId?: number): Promise<Booking> {
         const result = await this._database.getById(id, userId);
 
-        if (result.length === 0) {
+        if (result.length !== 1) {
             throw RESOURCE_NOT_FOUND;
         }
 

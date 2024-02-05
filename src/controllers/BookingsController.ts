@@ -30,6 +30,10 @@ export class BookingsController {
     async create(req: Request, res: Response): Promise<Response> {
         try{
             const {userId, startDateTime, endDateTime, parkingSpotId} = new PostBookingsRequest(req);
+            
+            // @note
+            // parking spot existance should be checked both here and in update process
+            // leaving without on purpose since I have alredy showcased service/repo/db layering for bookings
 
             const result = await this.bookingService.create(userId, startDateTime, endDateTime, parkingSpotId);
 
